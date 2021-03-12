@@ -1,40 +1,49 @@
 import React from "react";
+import axios from "axios";
+import Movie from "./Movie";
+import "./App.css";
+// import PropTypes from "prop-types";
 
-function Food({name, picture}){
-  return ( <div>
-    <h2>I like {name} </h2>
-    <img src={picture} alt={name} />
-  </div>
-  );
+class App extends React.Component{
+  state = {
+    isLoading : true,
+    movies : []
+  };
+  getMovies = async () => {
+    const {
+      data : {
+        data : {movies}
+     }
+    } = await axios.get("https://yts-proxy.now.sh/list_movies.json?sort_by=rating")
+    this.setState({movies, isLoading : false})
+  }
+  async componentDidMount(){
+    this.getMovies();
+  }
+  render(){
+    const {isLoading, movies} = this.state;
+    console.log(movies)
+    return <section className="container">
+      {isLoading ? (
+       <div className = "loader">
+         <span className="loader__text">Loading...</span>
+       </div>
+      ) : (
+        <div className = "movies">
+          {movies.map(movie =>(
+            <Movie
+              key = {movie.id}
+              id = {movie.id}
+              year = {movie.year}
+              title = {movie.title}
+              summary = {movie.summary}
+              poster = {movie.medium_cover_image}
+              genres = {movie.genres}
+            />
+          ))}
+        </div>
+      )}</section>;
+  }
 }
-
-const foodILike = [
-  {
-    name  : "Kimchi",
-    image : "https://contents.sixshop.com/thumbnails/uploadedFiles/72878/product/image_1540176020065_1000.jpg"
-  },
-  {
-    name  : "Samgeopsal",
-    image : "asdf"
-  },
-  // {
-  //   name  : "CooKumi",
-  //   image : "sd"
-  // },
-  // {
-  //   name : "Bibimbap",
-  //   image : "df"
-  // }
-];
-
-function App() {
-  return (
-  <div>
-    {foodILike.map( dish =>(
-      <Food name={dish.name} picture={dish.image} />
-    ))}
-  </div>
-  );
-} 
 
 export default App;
